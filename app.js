@@ -8,20 +8,20 @@ const app = express();
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
-const adminData = require('./routes/admin');
+const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
+
+const exceptionsController = require('./controllers/exceptions');
 
 //Serverside middlewares
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(path.join(__dirname, 'public')));
 
 //Aplication paths middleware
-app.use('/admin', adminData.routes);
+app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 
 //Responce error middleware
-app.use((req, res, next) => {
-    res.status(404).render('404', {pageTitle: 'Page Not Found'});
-});
+app.use(exceptionsController.get404);
 
 app.listen(3000);
