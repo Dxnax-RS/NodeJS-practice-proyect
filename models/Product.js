@@ -4,10 +4,11 @@ const path = require('path');
 const rootDir = require('../util/path');
 
 const p = path.join(rootDir, 'data', 'products.json');
+
 const getProductsFromFile = cb => {
     fs.readFile(p, (err, fileContent) => {
         if(err){
-            return cb([])
+            return cb([]);
         }
         return cb(JSON.parse(fileContent));
     });
@@ -15,7 +16,7 @@ const getProductsFromFile = cb => {
 
 module.exports = class Product {
     constructor(t){
-        this.title = t
+        this.title = t;
     }
 
     save(){
