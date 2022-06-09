@@ -10,6 +10,17 @@ exports.getProducts = (req, res, next) => {
     });
 };
 
+exports.getProductById = (req, res, next) => {
+    const productId = req.params.productId;
+    Product.fetch(productId, (product) => {
+        res.render('shop/product-detail', {
+            product: product, 
+            pageTitle: product.title, 
+            path: '/products', 
+        });
+    });
+};
+
 exports.getAdminProducts = (req, res, next) => {
     Product.fetchAll((products) => {
         res.render('admin/products', {
@@ -24,7 +35,7 @@ exports.getAddProduct = (req, res, next) => {
     res.render('admin/add-product', {
         pageTitle: 'Add Product', 
         path: '/admin/add-product',
-    })
+    });
 };
 
 exports.postAddProduct = (req, res, next) => {
