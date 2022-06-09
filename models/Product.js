@@ -33,7 +33,7 @@ module.exports = class Product {
     }
 
     static fetch(id, cb){
-        getProductsFromFile((products) => {7
+        getProductsFromFile((products) => {
             const product = products.find(p => p.id === id);
             return cb(product);
         });
