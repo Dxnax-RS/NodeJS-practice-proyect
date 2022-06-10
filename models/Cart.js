@@ -18,7 +18,7 @@ module.exports = class Cart{
             if(existingProductIndex !== -1){
                 cart.products[existingProductIndex].qty += 1;
             } else {
-                cart.products.push({ id: 1, qty: 1 });
+                cart.products.push({ id: id, qty: 1 });
             }
             cart.totalPrice += +productPrice;
             fs.writeFile(p, JSON.stringify(cart), (err) => {
@@ -42,6 +42,17 @@ module.exports = class Cart{
             fs.writeFile(p, JSON.stringify(updatedCart), (err) => {
                 console.log(err);
             });
+        });
+    };
+
+    static fetchAll(cb)
+    {
+        fs.readFile(p, (err, fileContent) => {
+            if(err){
+                return cb([]);
+            }
+            const cart = {...JSON.parse(fileContent)};
+            return cb(cart);
         });
     }
 
