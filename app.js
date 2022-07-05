@@ -8,6 +8,8 @@ const Product = require('./models/Product');
 const User = require('./models/User');
 const Cart = require('./models/Cart');
 const CartProduct = require('./models/Cart-Product');
+const Order = require('./models/Order');
+const OrderProduct = require('./models/Order-Product');
 
 const app = express();
 
@@ -45,10 +47,14 @@ User.hasOne(Cart);
 Cart.belongsTo(User);
 Cart.belongsToMany(Product, {through: CartProduct});
 Product.belongsToMany(Cart, {through: CartProduct});
+Order.belongsTo(User);
+User.hasMany(Order);
+Order.belongsToMany(Product, {through: OrderProduct});
+Product.belongsToMany(Order, {through: OrderProduct});
 
 sequelize
-.sync({force:true})
-//.sync()
+// .sync({force:true})
+.sync()
 .then(result => {
     return User.findByPk(1);
     //console.log(result);
@@ -60,6 +66,9 @@ sequelize
     return Promise.resolve(user);
 })
 .then(user => {
+    return user.createCart();
+})
+.then(cart => {
     app.listen(3000);
 })
 .catch(err => {
