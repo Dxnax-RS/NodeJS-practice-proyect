@@ -56,12 +56,9 @@ exports.postAddProduct = (req, res, next) => {
     const imageUrl = req.body.imageUrl;
     const description = req.body.description;
     const price = req.body.price;
-    req.user.createProduct({
-        title: title,
-        price: price,
-        imageUrl: imageUrl,
-        description: description
-    }).then(result => {
+    const product = new Product(title, price, description, imageUrl);
+    product.save()
+    .then(result => {
         console.log(result);
         res.redirect('/admin/products');
     }).catch(err => {
@@ -100,7 +97,7 @@ exports.postEditProduct = (req, res, next) => {
         product.title = updatedTitle;
         product.price = updatedPrice;
         product.description = updatedDescription;
-        product.price = updatedPrice;
+        product.image = updatedImageUrl;
         return product.save();
     })
     .then(result => {

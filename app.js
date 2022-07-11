@@ -3,7 +3,7 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const mongoConnect = require('./util/database');
+const mongoConnect = require('./util/database').mongoConnect;
 
 const app = express();
 
@@ -26,6 +26,7 @@ app.use((req, res, next) => {
     //     next();
     // })
     // .catch(err => console.log(err));
+    next();
 });
 
 //Aplication paths middleware
