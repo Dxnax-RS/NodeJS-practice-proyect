@@ -11,7 +11,7 @@ app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 const adminRoutes = require('./routes/admin');
-// const shopRoutes = require('./routes/shop');
+const shopRoutes = require('./routes/shop');
 const exceptionsController = require('./controllers/exceptions');
 const { domainToASCII } = require('url');
 
@@ -31,7 +31,7 @@ app.use((req, res, next) => {
 
 //Aplication paths middleware
 app.use('/admin', adminRoutes);
-// app.use(shopRoutes);
+app.use(shopRoutes);
 
 //Responce error middleware
 app.use(exceptionsController.get404);
