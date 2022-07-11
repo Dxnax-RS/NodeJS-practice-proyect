@@ -13,6 +13,9 @@ app.set('views', 'views');
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const exceptionsController = require('./controllers/exceptions');
+
+const User = require('./models/User');
+
 const { domainToASCII } = require('url');
 
 //Serverside middlewares
@@ -20,13 +23,12 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
-    // User.findByPk(1)
-    // .then(user => {
-    //     req.user = user;
-    //     next();
-    // })
-    // .catch(err => console.log(err));
-    next();
+    User.findById("62cc573b15a07e592364ddd0")
+    .then(user => {
+        req.user = new User(user.name, user.email, user.cart, user._id);
+        next();
+    })
+    .catch(err => console.log(err));
 });
 
 //Aplication paths middleware
