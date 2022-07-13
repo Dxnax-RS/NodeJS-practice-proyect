@@ -3,13 +3,7 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const sequelize = require('./util/database');
-const Product = require('./models/Product');
-const User = require('./models/User');
-const Cart = require('./models/Cart');
-const CartProduct = require('./models/Cart-Product');
-const Order = require('./models/Order');
-const OrderProduct = require('./models/Order-Product');
+const mongoConnect = require('./util/database').mongoConnect;
 
 const app = express();
 
@@ -19,6 +13,9 @@ app.set('views', 'views');
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const exceptionsController = require('./controllers/exceptions');
+
+const User = require('./models/User');
+
 const { domainToASCII } = require('url');
 
 //Serverside middlewares
@@ -26,9 +23,9 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
-    User.findByPk(1)
+    User.findById("62cc573b15a07e592364ddd0")
     .then(user => {
-        req.user = user;
+        req.user = new User(user.name, user.email, user.cart, user._id);
         next();
     })
     .catch(err => console.log(err));
@@ -41,36 +38,6 @@ app.use(shopRoutes);
 //Responce error middleware
 app.use(exceptionsController.get404);
 
-Product.belongsTo(User, {constrains: true, onDelete: 'CASCADE'});
-User.hasMany(Product);
-User.hasOne(Cart);
-Cart.belongsTo(User);
-Cart.belongsToMany(Product, {through: CartProduct});
-Product.belongsToMany(Cart, {through: CartProduct});
-Order.belongsTo(User);
-User.hasMany(Order);
-Order.belongsToMany(Product, {through: OrderProduct});
-Product.belongsToMany(Order, {through: OrderProduct});
-
-sequelize
-// .sync({force:true})
-.sync()
-.then(result => {
-    return User.findByPk(1);
-    //console.log(result);
-})
-.then(user => {
-    if(!user){
-        return User.create({name: 'Donitas', email: 'Eldonitas@email.com'});
-    }
-    return Promise.resolve(user);
-})
-.then(user => {
-    return user.createCart();
-})
-.then(cart => {
+mongoConnect(() => {
     app.listen(3000);
-})
-.catch(err => {
-    console.log(err);
 });
