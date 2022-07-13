@@ -70,6 +70,38 @@ class User{
         );
     }
 
+    getOrders(){
+        const db = getDb();
+        
+        return db.collection('orders').find({'user._id': new mongodb.ObjectId(this._id)}).toArray();
+    }
+
+    addOrder(){
+        const db = getDb();
+
+        return this.getCart()
+        .then(products => {
+            const order = {
+                user: {
+                    _id: new mongodb.ObjectId(this._id),
+                    name: this.name,
+                    email: this.email
+                },
+                items: products
+            }
+            return db.collection('orders').insertOne(order);
+        })
+        .then(result => {
+            this.cart = {items: []};
+            return db.collection('users')
+            .updateOne(
+                {_id: new mongodb.ObjectId(this._id)}, 
+                {$set: {cart: {items: []}}}
+            );
+        })
+        .catch(err => console.log(err));
+    }
+
     static findById(userId){
         const db = getDb();
         return db.collection('users').findOne({_id: new mongodb.ObjectId(userId)})
