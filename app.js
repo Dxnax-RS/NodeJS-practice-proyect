@@ -13,6 +13,7 @@ app.set('views', 'views');
 
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
+const authRoutes = require('./routes/auth');
 const exceptionsController = require('./controllers/exceptions');
 
 const User = require('./models/User');
@@ -36,6 +37,7 @@ app.use((req, res, next) => {
 //Aplication paths middleware
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
+app.use(authRoutes);
 
 //Responce error middleware
 app.use(exceptionsController.get404);
