@@ -3,6 +3,10 @@ const Order = require('../models/Order');
 // const Order = require('../models/Order');
 
 exports.getCart = (req, res, next) => {
+    const isAuthenticated = req
+        .get('Cookie')
+        .split('=')[0];
+
     req.user
     .populate('cart.items.productId')
     .then(products => {
@@ -11,6 +15,7 @@ exports.getCart = (req, res, next) => {
             pageTitle: 'Cart', 
             path: '/cart',
             products: products.cart.items,
+            isAuthenticated: isAuthenticated
         });
     })
     .catch(err => console.log(err));
@@ -39,6 +44,10 @@ exports.postDeleteFromCart = (req, res, next) => {
 };
 
 exports.getOrders = (req, res, next) => {
+    const isAuthenticated = req
+    .get('Cookie')
+    .split('=')[0];
+    
     Order.find({'user' : req.user._id})
     .populate('products.product')
     .then(orders => {
@@ -46,7 +55,8 @@ exports.getOrders = (req, res, next) => {
         res.render('shop/orders', {
             pageTitle: 'Your Orders', 
             path: '/orders',
-            orders: orders
+            orders: orders,
+            isAuthenticated: isAuthenticated
         });
     })
     .catch(err => console.log(err));

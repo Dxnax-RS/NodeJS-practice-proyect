@@ -1,12 +1,17 @@
 const Product = require('../models/Product');
 
 exports.getProducts = (req, res, next) => {
+    const isAuthenticated = req
+        .get('Cookie')
+        .split('=')[0];
+
     Product.find()
     .then(products => {
         res.render('shop/product-list', {
             prods: products, 
             pageTitle: 'Products List', 
             path: '/products', 
+            isAuthenticated: isAuthenticated
         });
     })
     .catch(err => {
@@ -15,13 +20,18 @@ exports.getProducts = (req, res, next) => {
 };
 
 exports.getProductById = (req, res, next) => {
+    const isAuthenticated = req
+        .get('Cookie')
+        .split('=')[0];
     const productId = req.params.productId;
+
     Product.findById(productId)
         .then(product => {
             res.render('shop/product-detail', {
                 product: product, 
                 pageTitle: product.title, 
                 path: '/products', 
+                isAuthenticated: isAuthenticated
             });
         })
         .catch(err => console.log(err));
@@ -29,12 +39,17 @@ exports.getProductById = (req, res, next) => {
 };
 
 exports.getAdminProducts = (req, res, next) => {
+    const isAuthenticated = req
+        .get('Cookie')
+        .split('=')[0];
+
     Product.find() 
     .then(products => {
         res.render('admin/products', {
             prods: products, 
             pageTitle: 'Products List', 
             path: '/admin/products', 
+            isAuthenticated: isAuthenticated
         });
     })
     .catch(err => {
@@ -43,11 +58,16 @@ exports.getAdminProducts = (req, res, next) => {
 }
 
 exports.getAddProduct = (req, res, next) => {
+    const isAuthenticated = req
+        .get('Cookie')
+        .split('=')[0];
+
     res.render('admin/edit-product', {
         pageTitle: 'Add Product', 
         path: '/admin/add-product',
         editing: false,
-        product: []
+        product: [],
+        isAuthenticated: isAuthenticated
     });
 };
 
@@ -75,6 +95,10 @@ exports.postAddProduct = (req, res, next) => {
 exports.getEditProduct = (req, res, next) => {
     const editMode = req.query.edit;
     const productId = req.params.productId
+    const isAuthenticated = req
+        .get('Cookie')
+        .split('=')[0];
+        
     Product.findById(productId)
     .then(product => {
         if(!product){
@@ -84,7 +108,8 @@ exports.getEditProduct = (req, res, next) => {
             pageTitle: 'Edit Product', 
             path: '/admin/edit-product',
             editing: editMode,
-            product: product
+            product: product,
+            isAuthenticated: isAuthenticated
         });
     })
     .catch(err => console.log(err));
