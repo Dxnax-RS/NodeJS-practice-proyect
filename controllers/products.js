@@ -1,17 +1,13 @@
 const Product = require('../models/Product');
 
 exports.getProducts = (req, res, next) => {
-    const isAuthenticated = req
-        .get('Cookie')
-        .split('=')[0];
-
     Product.find()
     .then(products => {
         res.render('shop/product-list', {
             prods: products, 
             pageTitle: 'Products List', 
             path: '/products', 
-            isAuthenticated: isAuthenticated
+            isAuthenticated: req.session.isLoggedIn
         });
     })
     .catch(err => {
@@ -20,9 +16,6 @@ exports.getProducts = (req, res, next) => {
 };
 
 exports.getProductById = (req, res, next) => {
-    const isAuthenticated = req
-        .get('Cookie')
-        .split('=')[0];
     const productId = req.params.productId;
 
     Product.findById(productId)
@@ -31,7 +24,7 @@ exports.getProductById = (req, res, next) => {
                 product: product, 
                 pageTitle: product.title, 
                 path: '/products', 
-                isAuthenticated: isAuthenticated
+                isAuthenticated: req.session.isLoggedIn
             });
         })
         .catch(err => console.log(err));
@@ -39,17 +32,13 @@ exports.getProductById = (req, res, next) => {
 };
 
 exports.getAdminProducts = (req, res, next) => {
-    const isAuthenticated = req
-        .get('Cookie')
-        .split('=')[0];
-
     Product.find() 
     .then(products => {
         res.render('admin/products', {
             prods: products, 
             pageTitle: 'Products List', 
-            path: '/admin/products', 
-            isAuthenticated: isAuthenticated
+            path: '/admin/products',
+            isAuthenticated: req.session.isLoggedIn 
         });
     })
     .catch(err => {
@@ -58,16 +47,12 @@ exports.getAdminProducts = (req, res, next) => {
 }
 
 exports.getAddProduct = (req, res, next) => {
-    const isAuthenticated = req
-        .get('Cookie')
-        .split('=')[0];
-
     res.render('admin/edit-product', {
         pageTitle: 'Add Product', 
         path: '/admin/add-product',
         editing: false,
         product: [],
-        isAuthenticated: isAuthenticated
+        isAuthenticated: req.session.isLoggedIn
     });
 };
 
@@ -81,7 +66,7 @@ exports.postAddProduct = (req, res, next) => {
         price: price,
         description: description,
         imageUrl: imageUrl,
-        userId: req.user._id
+        userId: req.session.user._id
     });
     product.save()
     .then(result => {
@@ -95,9 +80,6 @@ exports.postAddProduct = (req, res, next) => {
 exports.getEditProduct = (req, res, next) => {
     const editMode = req.query.edit;
     const productId = req.params.productId
-    const isAuthenticated = req
-        .get('Cookie')
-        .split('=')[0];
         
     Product.findById(productId)
     .then(product => {
@@ -109,7 +91,7 @@ exports.getEditProduct = (req, res, next) => {
             path: '/admin/edit-product',
             editing: editMode,
             product: product,
-            isAuthenticated: isAuthenticated
+            isAuthenticated: req.session.isLoggedIn
         });
     })
     .catch(err => console.log(err));

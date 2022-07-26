@@ -4,10 +4,17 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const session = require('express-session');
+const MongoDBStore = require('connect-mongodb-session')(session);
 
 const mongoConnect = require('./util/database').mongoConnect;
 
+const MONGODB_URI = 'mongodb+srv://Dxnax:H4x81dgdew0ZPkl7@cluster0.gh1bazt.mongodb.net/shop?retryWrites=true&w=majority'
+
 const app = express();
+const store = new MongoDBStore({
+    uri: MONGODB_URI,
+    collection: 'sessions'
+});
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
@@ -19,21 +26,29 @@ const exceptionsController = require('./controllers/exceptions');
 
 const User = require('./models/User');
 
-const { domainToASCII } = require('url');
-const { userInfo } = require('os');
-
 //Serverside middlewares
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({secret: 'my secret', resave: false, saveUninitialized: false}));
+app.use(session({
+    secret: 'my secret',
+    resave: false, 
+    saveUninitialized: false, 
+    store: store
+}));
 
 app.use((req, res, next) => {
-    User.findById("62d04b39f18f72d83a0ce910")
-    .then(user => {
-        req.user = user;
+    if(req.session.isLoggedIn)
+    {
+        User.findById(req.session.user._id)
+        .then(user => {
+            req.user = user;
+            next();
+        })
+        .catch(err => console.log(err));
+    }
+    else{
         next();
-    })
-    .catch(err => console.log(err));
+    }
 });
 
 //Aplication paths middleware
@@ -44,20 +59,8 @@ app.use(authRoutes);
 //Responce error middleware
 app.use(exceptionsController.get404);
 
-mongoose.connect('mongodb+srv://Dxnax:H4x81dgdew0ZPkl7@cluster0.gh1bazt.mongodb.net/shop?retryWrites=true&w=majority')
+mongoose.connect(MONGODB_URI)
 .then(result => {
-    User.findOne().then(user => {
-        if(!user){
-            const user = new User({
-                name: 'Daniel',
-                email: 'daniel@email.com',
-                cart: {
-                    items: []
-                }
-            });
-            user.save();
-        }
-    })
     app.listen(3000);
 })
 .catch(err => console.log(err));
