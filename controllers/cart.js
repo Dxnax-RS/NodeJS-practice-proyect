@@ -11,6 +11,7 @@ exports.getCart = (req, res, next) => {
             pageTitle: 'Cart', 
             path: '/cart',
             products: products.cart.items,
+            isAuthenticated: req.session.isLoggedIn
         });
     })
     .catch(err => console.log(err));
@@ -39,14 +40,15 @@ exports.postDeleteFromCart = (req, res, next) => {
 };
 
 exports.getOrders = (req, res, next) => {
-    Order.find({'user' : req.user._id})
+    Order.find({'user' : req.session.user._id})
     .populate('products.product')
     .then(orders => {
         console.log(orders[0].products);
         res.render('shop/orders', {
             pageTitle: 'Your Orders', 
             path: '/orders',
-            orders: orders
+            orders: orders,
+            isAuthenticated: req.session.isLoggedIn
         });
     })
     .catch(err => console.log(err));

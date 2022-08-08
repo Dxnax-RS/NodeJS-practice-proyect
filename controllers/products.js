@@ -7,6 +7,7 @@ exports.getProducts = (req, res, next) => {
             prods: products, 
             pageTitle: 'Products List', 
             path: '/products', 
+            isAuthenticated: req.session.isLoggedIn
         });
     })
     .catch(err => {
@@ -16,12 +17,14 @@ exports.getProducts = (req, res, next) => {
 
 exports.getProductById = (req, res, next) => {
     const productId = req.params.productId;
+
     Product.findById(productId)
         .then(product => {
             res.render('shop/product-detail', {
                 product: product, 
                 pageTitle: product.title, 
                 path: '/products', 
+                isAuthenticated: req.session.isLoggedIn
             });
         })
         .catch(err => console.log(err));
@@ -34,7 +37,8 @@ exports.getAdminProducts = (req, res, next) => {
         res.render('admin/products', {
             prods: products, 
             pageTitle: 'Products List', 
-            path: '/admin/products', 
+            path: '/admin/products',
+            isAuthenticated: req.session.isLoggedIn 
         });
     })
     .catch(err => {
@@ -47,7 +51,8 @@ exports.getAddProduct = (req, res, next) => {
         pageTitle: 'Add Product', 
         path: '/admin/add-product',
         editing: false,
-        product: []
+        product: [],
+        isAuthenticated: req.session.isLoggedIn
     });
 };
 
@@ -61,7 +66,7 @@ exports.postAddProduct = (req, res, next) => {
         price: price,
         description: description,
         imageUrl: imageUrl,
-        userId: req.user._id
+        userId: req.session.user._id
     });
     product.save()
     .then(result => {
@@ -75,6 +80,7 @@ exports.postAddProduct = (req, res, next) => {
 exports.getEditProduct = (req, res, next) => {
     const editMode = req.query.edit;
     const productId = req.params.productId
+        
     Product.findById(productId)
     .then(product => {
         if(!product){
@@ -84,7 +90,8 @@ exports.getEditProduct = (req, res, next) => {
             pageTitle: 'Edit Product', 
             path: '/admin/edit-product',
             editing: editMode,
-            product: product
+            product: product,
+            isAuthenticated: req.session.isLoggedIn
         });
     })
     .catch(err => console.log(err));
