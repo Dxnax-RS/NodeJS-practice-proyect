@@ -37,18 +37,17 @@ app.use(session({
 }));
 
 app.use((req, res, next) => {
-    if(req.session.isLoggedIn)
+    if(!req.session.isLoggedIn)
     {
-        User.findById(req.session.user._id)
-        .then(user => {
-            req.user = user;
-            next();
-        })
-        .catch(err => console.log(err));
-    }
-    else{
         next();
     }
+
+    User.findById(req.session.user._id)
+    .then(user => {
+        req.user = user;
+        next();
+    })
+    .catch(err => console.log(err));
 });
 
 //Aplication paths middleware
